@@ -10,17 +10,17 @@ import java.io.IOException;
 public class PdfService {
 
     public String extractTextFromPdf(MultipartFile file) {
-        // Try-with-resources ensures the document closes automatically to prevent memory leaks
         try (PDDocument document = PDDocument.load(file.getInputStream())) {
-            
-            // Create the stripper (this pulls the text out)
             PDFTextStripper stripper = new PDFTextStripper();
+            String text = stripper.getText(document);
             
-            // Extract and return the text
-            return stripper.getText(document);
-            
+            if (text == null || text.trim().isEmpty()) {
+                return "Error: No text found. This PDF might be an image scan.";
+            }
+            return text.trim();
         } catch (IOException e) {
-            throw new RuntimeException("Failed to extract text from PDF", e);
+            e.printStackTrace();
+            return "Error parsing PDF: " + e.getMessage();
         }
     }
 }

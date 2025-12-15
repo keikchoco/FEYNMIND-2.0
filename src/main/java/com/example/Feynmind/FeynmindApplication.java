@@ -6,8 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class FeynmindApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(FeynmindApplication.class, args);
-	}
-
+    public static void main(String[] args) {
+        SpringApplication.run(FeynmindApplication.class, args);
+    }
 }

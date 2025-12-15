@@ -1,68 +1,172 @@
+:root {
+  --primary-color: #646cff;
+  --primary-hover: #535bf2;
+  --bg-color: #121212;
+  --card-bg: #1e1e1e;
+  --text-color: #ffffff;
+  --border-color: #333;
+}
+
 #root {
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: var(--text-color);
+  background-color: var(--bg-color);
+  min-height: 100vh;
 }
 
+/* --- LAYOUT --- */
 .container {
   max-width: 800px;
   margin: 0 auto;
   text-align: center;
 }
 
+h1 {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+  background: -webkit-linear-gradient(45deg, #646cff, #a264ff);
+  
+  /* Add the standard property first */
+  background-clip: text;
+  
+  /* Keep the webkit prefix for Chrome/Safari */
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: #e0e0e0;
+}
+
+/* --- CARDS --- */
 .card {
-  background: #1a1a1a;
-  padding: 2em;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+  background: var(--card-bg);
+  padding: 2.5rem;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
   margin-top: 20px;
   text-align: left;
+  border: 1px solid var(--border-color);
+  transition: transform 0.2s, border-color 0.2s;
 }
 
-.upload-zone {
-  border: 2px dashed #646cff;
-  padding: 40px;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: background 0.3s;
+.chat-mode {
+  border-left: 5px solid var(--primary-color);
 }
 
-.upload-zone:hover {
-  background: #242424;
-}
-
+/* --- INPUTS & BUTTONS --- */
 button {
-  background-color: #646cff;
+  background-color: var(--primary-color);
   color: white;
-  padding: 10px 20px;
+  padding: 12px 24px;
   border: none;
-  border-radius: 6px;
-  font-weight: bold;
+  border-radius: 8px;
+  font-weight: 600;
   cursor: pointer;
   font-size: 1rem;
+  transition: all 0.2s ease;
+  margin-right: 10px; /* Space between buttons */
   margin-top: 10px;
 }
 
-button:disabled {
-  background-color: #555;
-  cursor: not-allowed;
+button:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-2px);
 }
 
+button:disabled {
+  background-color: #444;
+  color: #888;
+  cursor: not-allowed;
+  transform: none;
+}
+
+input[type="file"] {
+  display: block;
+  margin: 0 auto 20px auto;
+  padding: 10px;
+  background: #2a2a2a;
+  border-radius: 8px;
+  color: #fff;
+  border: 1px dashed #555;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+textarea {
+  background: #2a2a2a;
+  color: white;
+  border: 1px solid #444;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 1rem;
+  resize: vertical;
+  width: 100%;
+  box-sizing: border-box; 
+  padding: 10px;
+}
+
+textarea:focus {
+  outline: 2px solid var(--primary-color);
+  border-color: transparent;
+}
+
+/* --- TOPIC LIST --- */
 .topic-list {
   display: grid;
-  gap: 10px;
+  gap: 15px;
   margin-top: 20px;
 }
 
 .topic-item {
-  background: #2a2a2a;
-  padding: 15px;
-  border-radius: 8px;
-  border: 1px solid #444;
-  cursor: pointer;
+  background: #252525;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid #3a3a3a;
+  transition: border-color 0.2s;
 }
 
 .topic-item:hover {
-  border-color: #646cff;
+  border-color: var(--primary-color);
+  background: #2a2a2a;
+}
+
+.topic-item h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #fff;
+}
+
+/* --- FEEDBACK BOX --- */
+.feedback-box {
+  background-color: #252525;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-top: 1.5rem;
+  border-left: 4px solid #28a745; /* Green for feedback */
+  line-height: 1.6;
+  white-space: pre-wrap; /* Preserves formatting */
+}
+
+/* --- BACK BUTTON --- */
+.back-btn {
+  background: transparent;
+  color: #aaa;
+  padding: 5px 0;
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+  border: none;
+  box-shadow: none;
+}
+
+.back-btn:hover {
+  background: transparent;
+  color: #fff;
+  text-decoration: underline;
+  transform: none;
 }

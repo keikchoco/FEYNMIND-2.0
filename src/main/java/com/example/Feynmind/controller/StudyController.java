@@ -1,110 +1,75 @@
 package com.example.Feynmind.controller;
 
+import com.example.Feynmind.model.StudyMaterial;
+import com.example.Feynmind.repository.StudyMaterialRepository;
 import com.example.Feynmind.service.AiService;
-import com.example.Feynmind.service.PdfService; // Assuming you might look up files later
-import com.example.Feynmind.controller.DocumentController; // To access the temp storage
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/study")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:5173") // Ensure this matches your frontend port
 public class StudyController {
 
     private final AiService aiService;
+    private final StudyMaterialRepository repository;
 
-    public StudyController(AiService aiService) {
+    public StudyController(AiService aiService, StudyMaterialRepository repository) {
         this.aiService = aiService;
+        this.repository = repository;
     }
 
-    // STEP 1: Get the topics for a specific file
-    // POST http://localhost:8080/api/study/analyze
-    // Body: { "fileName": "physics_intro.pdf" }
+    // --- HELPER METHOD ---
+    private String getTextFromDb(String fileName) {
+        List<StudyMaterial> materials = repository.findByFileName(fileName);
+        
+        if (materials.isEmpty()) {
+            return null;
+        }
+        // Safely get the first file found
+        return materials.get(0).getContent();
+    }
+
+    // --- ENDPOINTS ---
+
     @PostMapping("/analyze")
     public String getTopics(@RequestBody Map<String, String> payload) {
-        String fileName = payload.get("fileName");
-        
-        // 1. Retrieve the text we saved in memory earlier
-        String pdfText = DocumentController.temporaryStorage.get(fileName);
-        
-        if (pdfText == null) {
-            return "Error: File not found in memory. Please upload again.";
-        }
-
-        // 2. Ask AI to generate the menu
-        return aiService.generateStudyTopics(pdfText);
+        String text = getTextFromDb(payload.get("fileName"));
+        if (text == null) return "Error: File not found in database.";
+        return aiService.generateStudyTopics(text);
     }
 
-    // STEP 2: The Student tries to explain a topic
-    // POST http://localhost:8080/api/study/feynman-check
-    // Body: { "concept": "Gravity", "explanation": "It is a force that pulls..." }
     @PostMapping("/feynman-check")
     public String checkUnderstanding(@RequestBody Map<String, String> payload) {
-        String concept = payload.get("concept");
-        String explanation = payload.get("explanation");
+        // 1. Extract Difficulty (Default to 'medium' if null)
+        String difficulty = payload.getOrDefault("difficulty", "medium");
 
-        // 3. Ask AI to grade it
-        return aiService.assessStudentExplanation(concept, explanation);
-    }
-}
-
-// STEP 3: Generate a Quiz for a Concept
-    // POST http://localhost:8080/api/study/quiz
-    // Body: { "fileName": "physics.pdf", "concept": "Gravity" }
-    @PostMapping("/quiz")
-    public String getQuiz(@RequestBody Map<String, String> payload) {
-        String fileName = payload.get("fileName");
-        String concept = payload.get("concept");
-        
-        // 1. Get the text from memory
-        String pdfText = DocumentController.temporaryStorage.get(fileName);
-        
-        if (pdfText == null) {
-            return "Error: File context lost. Please upload again.";
-        }
-
-        // 2. Ask AI to create the quiz
-        return aiService.generateQuiz(concept, pdfText);
+        // 2. Pass concept, explanation, AND difficulty to the Service
+        return aiService.assessStudentExplanation(
+            payload.get("concept"), 
+            payload.get("explanation"),
+            difficulty
+        );
     }
 
-// STEP 4: Get a Refinement/Analogy
-    // POST http://localhost:8080/api/study/analogy
-    // Body: { "concept": "Polymorphism" }
     @PostMapping("/analogy")
     public String getAnalogy(@RequestBody Map<String, String> payload) {
-        String concept = payload.get("concept");
-        return aiService.generateAnalogy(concept);
+        // 1. Extract Difficulty
+        String difficulty = payload.getOrDefault("difficulty", "medium");
+
+        // 2. Pass concept AND difficulty to the Service
+        return aiService.generateAnalogy(
+            payload.get("concept"),
+            difficulty
+        );
     }
-// STEP 5: Log Student Performance (For Research Data)
-    // POST http://localhost:8080/api/study/log-progress
+
     @PostMapping("/log-progress")
     public String logProgress(@RequestBody Map<String, Object> payload) {
-        String fileName = (String) payload.get("fileName");
-        String concept = (String) payload.get("concept");
-        int score = (int) payload.get("score"); // e.g., 3 out of 3
-        String type = (String) payload.get("type"); // "QUIZ" or "CHAT"
-
-        // SIMULATE DATABASE SAVE
-        System.out.println("=== RESEARCH DATA LOG ===");
-        System.out.println("File: " + fileName);
-        System.out.println("Concept: " + concept);
-        System.out.println("Activity Type: " + type);
-        System.out.println("Performance Score: " + score);
-        System.out.println("Timestamp: " + java.time.LocalDateTime.now());
-        System.out.println("=========================");
-
-        // In the future, this is where 'repository.save(new ProgressLog(...))' goes
-        
-        return "Progress logged successfully.";
+        // Useful for debugging if data is reaching the backend
+        System.out.println("=== LOG: " + payload.get("concept") + " - Difficulty: " + payload.get("difficulty"));
+        return "Logged.";
     }
-            Create a simple analogy to help the student understand better.
-            Keep it concise and easy to grasp.
-            """, concept);
-
-        return chatClient.prompt()
-                .user(prompt)
-                .call()
-                .content();
-    }
-                
+}
